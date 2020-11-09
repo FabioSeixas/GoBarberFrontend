@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { isToday, format } from 'date-fns';
+import { isToday, format, parseISO } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 import { FiClock, FiPower } from 'react-icons/fi';
 import DayPicker, { DayModifiers } from 'react-day-picker';
@@ -27,12 +27,22 @@ interface IMonthAvailability {
   available: boolean;
 }
 
+interface AppointmentData {
+  id: string;
+  date: string;
+  user: {
+    avatar: string;
+    name: string;
+  };
+}
+
 const Dashboard: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [monthAvailability, setMonthAvailability] = useState<
     IMonthAvailability[]
   >([]);
+  const [appointments, setAppointments] = useState<AppointmentData[]>([]);
 
   const { signOut, user } = useAuth();
 
@@ -59,6 +69,24 @@ const Dashboard: React.FC = () => {
       });
   }, [currentMonth, user.id]);
 
+  useEffect(() => {
+    api
+      .get('/appointments/me', {
+        params: {
+          day: selectedDate.getDate(),
+          month: selectedDate.getMonth() + 1,
+          year: selectedDate.getFullYear(),
+        },
+      })
+      .then(response => {
+        response.data.forEach((appointment: AppointmentData) => {
+          const parsedDate = parseISO(appointment.date);
+          Object.assign(appointment, { date: format(parsedDate, "HH':00'") });
+        });
+        setAppointments(response.data);
+      });
+  }, [selectedDate]);
+
   const disabledDays = useMemo(() => {
     const daysToDisable = monthAvailability
       .filter(monthDay => !monthDay.available)
@@ -75,12 +103,15 @@ const Dashboard: React.FC = () => {
 
   const selectedDateAsText = useMemo(() => {
     const monthDay = format(selectedDate, "'Dia' d");
+    let month = format(selectedDate, 'MMMM', { locale: ptBR });
     let weekDay = format(selectedDate, "EEEE'-feira'", { locale: ptBR });
 
+    month = month.charAt(0).toUpperCase() + month.slice(1);
     weekDay = weekDay.charAt(0).toUpperCase() + weekDay.slice(1);
 
     return {
       monthDay,
+      month,
       weekDay,
     };
   }, [selectedDate]);
@@ -108,8 +139,9 @@ const Dashboard: React.FC = () => {
         <Schedule>
           <h1>Horários Agendados</h1>
           <p>
-            <span>{isToday(selectedDate) && 'Hoje'}</span>
+            {isToday(selectedDate) && <span>Hoje</span>}
             <span>{selectedDateAsText.monthDay}</span>
+            <span>{selectedDateAsText.month}</span>
             <span>{selectedDateAsText.weekDay}</span>
           </p>
 
@@ -127,30 +159,20 @@ const Dashboard: React.FC = () => {
 
           <Section>
             <strong>Manhã</strong>
+            {appointments &&
+              appointments.map(appointment => (
+                <Appointment key={appointment.id}>
+                  <span>
+                    <FiClock />
+                    {appointment.date}
+                  </span>
 
-            <Appointment>
-              <span>
-                <FiClock />
-                08:00
-              </span>
-
-              <div>
-                <img src={user.avatar_url} alt="NextClient" />
-                <strong>{user.name}</strong>
-              </div>
-            </Appointment>
-
-            <Appointment>
-              <span>
-                <FiClock />
-                08:00
-              </span>
-
-              <div>
-                <img src={user.avatar_url} alt="NextClient" />
-                <strong>{user.name}</strong>
-              </div>
-            </Appointment>
+                  <div>
+                    <img src={appointment.user.avatar} alt="NextClient" />
+                    <strong>{appointment.user.name}</strong>
+                  </div>
+                </Appointment>
+              ))}
           </Section>
 
           <Section>
