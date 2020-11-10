@@ -18,6 +18,10 @@ export const HeaderContent = styled.div`
     height: 80px;
   }
 
+  a {
+    text-decoration: none;
+  }
+
   button {
     margin-left: auto;
     background: transparent;
@@ -55,6 +59,10 @@ export const Profile = styled.div`
 
     strong {
       color: #ff9000;
+
+      &:hover {
+        opacity: 0.8;
+      }
     }
   }
 `;

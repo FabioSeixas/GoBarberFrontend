@@ -5,6 +5,7 @@ import { FiClock, FiPower } from 'react-icons/fi';
 import DayPicker, { DayModifiers } from 'react-day-picker';
 import 'react-day-picker/lib/style.css';
 
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/auth';
 import {
   Container,
@@ -25,6 +26,7 @@ import api from '../../services/api';
 interface IMonthAvailability {
   day: number;
   available: boolean;
+  date: Date;
 }
 
 interface AppointmentData {
@@ -91,8 +93,17 @@ const Dashboard: React.FC = () => {
   }, [selectedDate]);
 
   const disabledDays = useMemo(() => {
+    const currentDate = new Date();
+
     const daysToDisable = monthAvailability
-      .filter(monthDay => !monthDay.available)
+      .filter(monthDay => {
+        const compareDate = new Date(
+          currentMonth.getFullYear(),
+          currentMonth.getMonth(),
+          monthDay.day,
+        );
+        return isBefore(compareDate, currentDate);
+      })
       .map(
         monthDay =>
           new Date(
@@ -101,6 +112,7 @@ const Dashboard: React.FC = () => {
             monthDay.day,
           ),
       );
+
     return daysToDisable;
   }, [currentMonth, monthAvailability]);
 
@@ -147,7 +159,7 @@ const Dashboard: React.FC = () => {
 
   const nextAppointment = useMemo(() => {
     return appointments.find(appointment => {
-      isAfter(parseISO(appointment.date), new Date());
+      return isAfter(parseISO(appointment.date), new Date());
     });
   }, [appointments]);
 
@@ -156,13 +168,15 @@ const Dashboard: React.FC = () => {
       <Header>
         <HeaderContent>
           <img src={logoImg} alt="GoBarber" />
-          <Profile>
-            <img src={user.avatar_url} alt="Fabio" />
-            <div>
-              <span>Bem vindo,</span>
-              <strong>{user.name}</strong>
-            </div>
-          </Profile>
+          <Link to="/profile">
+            <Profile>
+              <img src={user.avatar_url} alt="Fabio" />
+              <div>
+                <span>Bem vindo,</span>
+                <strong>{user.name}</strong>
+              </div>
+            </Profile>
+          </Link>
 
           <button type="button" onClick={signOut}>
             <FiPower />
