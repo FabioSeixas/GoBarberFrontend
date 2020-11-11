@@ -102,7 +102,7 @@ const Dashboard: React.FC = () => {
           currentMonth.getMonth(),
           monthDay.day,
         );
-        return isBefore(compareDate, currentDate);
+        return isAfter(currentDate, compareDate) && !isToday(compareDate);
       })
       .map(
         monthDay =>
