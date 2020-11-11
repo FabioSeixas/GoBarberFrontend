@@ -15,10 +15,15 @@ export const Header = styled.header`
     top: 50px;
     left: 100px;
     color: #999591;
+    transition: color 0.2s;
 
     svg {
       height: 20px;
       width: 20px;
+
+      &:hover {
+        color: ${shade(0.2, '#999591')};
+      }
     }
   }
 
@@ -31,28 +36,35 @@ export const Header = styled.header`
       border-radius: 50%;
     }
 
-    div {
-      top: 140px;
-      right: 10px;
-      border: 10px solid #ff9000;
+    label {
+      display: flex;
+      flex-direction: column;
+
+      position: absolute;
+      border: 0;
+      width: 48px;
+      height: 48px;
+      right: 0;
+      bottom: 0;
       border-radius: 50%;
       background-color: #ff9000;
+      cursor: pointer;
+      transition: background-color 0.2s;
 
-      button {
-        background-color: #ff9000;
-        border: 0;
-        display: flex;
-        align-items: center;
-        width: 22px;
-        height: 22px;
+      &:hover {
+        background: ${shade(0.2, '#ff9000')};
+      }
 
-        svg {
-          flex: 1;
-          width: 18px;
-          height: 18px;
-          color: #232129;
-          background-color: #ff9000;
-        }
+      input {
+        display: none;
+      }
+
+      svg {
+        flex: 1;
+        margin: 0 auto;
+        width: 18px;
+        height: 18px;
+        color: #232129;
       }
     }
   }
