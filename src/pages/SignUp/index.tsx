@@ -64,7 +64,6 @@ const SignUp: React.FC = () => {
           formRef.current?.setErrors(errors);
           return;
         }
-        console.log('asdasd');
         addToast({
           type: 'error',
           title: 'Erro no cadastro',
