@@ -1,5 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { isToday, format, parseISO, isBefore, isAfter } from 'date-fns';
+import {
+  isToday,
+  format,
+  parseISO,
+  isBefore,
+  isAfter,
+  isSameDay,
+} from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 import { FiClock, FiPower } from 'react-icons/fi';
 import DayPicker, { DayModifiers } from 'react-day-picker';
@@ -76,12 +83,16 @@ const Dashboard: React.FC = () => {
         },
       })
       .then(response => {
-        const formattedAppointment = response.data.map(appointment => {
-          return {
-            ...appointment,
-            formattedHour: format(parseISO(appointment.date), 'HH:mm'),
-          };
-        });
+        const formattedAppointment = response.data
+          .filter(appointment =>
+            isSameDay(parseISO(appointment.date), selectedDate),
+          )
+          .map(appointment => {
+            return {
+              ...appointment,
+              formattedHour: format(parseISO(appointment.date), 'HH:mm'),
+            };
+          });
         setAppointments(formattedAppointment);
       });
   }, [selectedDate]);
