@@ -170,7 +170,7 @@ const Dashboard: React.FC = () => {
           <img src={logoImg} alt="GoBarber" />
           <Link to="/profile">
             <Profile>
-              <img src={user.avatar_url} alt="Fabio" />
+              <img src={user.avatar_url} alt={user.name} />
               <div>
                 <span>Bem vindo,</span>
                 <strong>{user.name}</strong>
@@ -254,7 +254,7 @@ const Dashboard: React.FC = () => {
               ))}
           </Section>
         </Schedule>
-        <Calendar>
+        <Calendar data-testid="day-picker">
           <DayPicker
             weekdaysShort={['D', 'S', 'T', 'Q', 'Q', 'S', 'S']}
             fromMonth={new Date()}

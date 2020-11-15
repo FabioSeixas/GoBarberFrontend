@@ -45,7 +45,7 @@ describe('Toast Hook', () => {
   });
 
   it('should be able to remove a Toast manually', async () => {
-    const { getByText, getByTestId, debug } = render(<TestPage />, {
+    const { getByText, getByTestId } = render(<TestPage />, {
       wrapper: ToastProvider,
     });
 
@@ -65,8 +65,6 @@ describe('Toast Hook', () => {
 
     await waitForElementToBeRemoved(getByText('title123'), {
       timeout: 100,
-    }).then(() => {
-      debug();
     });
   });
 });
