@@ -23,12 +23,6 @@ import {
 import logoImg from '../../assets/logo.svg';
 import api from '../../services/api';
 
-interface IMonthAvailability {
-  day: number;
-  available: boolean;
-  // date: Date;
-}
-
 interface AppointmentData {
   id: string;
   date: string;
@@ -57,9 +51,7 @@ const Dashboard: React.FC = () => {
     return today;
   });
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [monthAvailability, setMonthAvailability] = useState<
-    IMonthAvailability[]
-  >([]);
+
   const [appointments, setAppointments] = useState<AppointmentData[]>([]);
 
   const { signOut, user } = useAuth();
@@ -73,19 +65,6 @@ const Dashboard: React.FC = () => {
   const handleMonthChange = useCallback((month: Date) => {
     setCurrentMonth(month);
   }, []);
-
-  useEffect(() => {
-    api
-      .get(`/providers/${user.id}/month-availability`, {
-        params: {
-          month: currentMonth.getMonth() + 1,
-          year: currentMonth.getFullYear(),
-        },
-      })
-      .then(response => {
-        setMonthAvailability(response.data);
-      });
-  }, [currentMonth, user.id]);
 
   useEffect(() => {
     api
@@ -110,18 +89,13 @@ const Dashboard: React.FC = () => {
   const disabledDays = useMemo(() => {
     const currentDate = new Date();
 
-    if (!monthAvailability.length) {
-      const days = Array.from({ length: 31 }, (_, i) => {
-        return {
-          day: i + 1,
-          available: true,
-        };
-      });
+    const days = Array.from({ length: 31 }, (_, i) => {
+      return {
+        day: i + 1,
+      };
+    });
 
-      setMonthAvailability(days);
-    }
-
-    const daysToDisable = monthAvailability
+    const daysToDisable = days
       .filter(monthDay => {
         const compareDate = new Date(
           currentMonth.getFullYear(),
@@ -140,7 +114,7 @@ const Dashboard: React.FC = () => {
       );
 
     return daysToDisable;
-  }, [currentMonth, monthAvailability]);
+  }, [currentMonth]);
 
   const selectedDateAsText = useMemo(() => {
     const monthDay = format(selectedDate, "'Dia' d");
@@ -211,7 +185,7 @@ const Dashboard: React.FC = () => {
       </Header>
 
       <Content>
-        <Schedule>
+        <Schedule data-testid="schedule-test">
           <h1>Horários Agendados</h1>
           <p>
             {isToday(selectedDate) && <span>Hoje</span>}
