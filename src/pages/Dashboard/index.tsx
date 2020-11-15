@@ -111,7 +111,7 @@ const Dashboard: React.FC = () => {
     const currentDate = new Date();
 
     if (!monthAvailability.length) {
-      const days = Array.from({ length: 10 }, (_, i) => {
+      const days = Array.from({ length: 31 }, (_, i) => {
         return {
           day: i + 1,
           available: true,
