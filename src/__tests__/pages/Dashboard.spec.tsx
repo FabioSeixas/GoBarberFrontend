@@ -25,9 +25,11 @@ jest.mock('react-router-dom', () => {
   };
 });
 
-MockDate.set(new Date(2020, 10, 2));
-
 describe('Dashboard Page', () => {
+  beforeEach(() => {
+    MockDate.reset();
+  });
+
   it('should be able to render dashboard', () => {
     const { getByText } = render(<Dashboard />);
 
@@ -37,6 +39,8 @@ describe('Dashboard Page', () => {
   });
 
   it('should be able to change selected date', () => {
+    MockDate.set(new Date(2020, 10, 3));
+
     const { getByLabelText, getAllByRole } = render(<Dashboard />);
 
     const selectDate = getByLabelText('Wed Nov 04 2020');
@@ -50,5 +54,23 @@ describe('Dashboard Page', () => {
     );
 
     expect(selectedDate?.textContent).toEqual('4');
+  });
+
+  it('should not be able to select a past date', () => {
+    MockDate.set(new Date(2020, 10, 3));
+
+    const { getByLabelText, getAllByRole } = render(<Dashboard />);
+
+    const selectDate = getByLabelText('Mon Nov 02 2020');
+
+    fireEvent.click(selectDate);
+
+    const dates = getAllByRole('gridcell');
+
+    const selectedDate = dates.find(
+      date => !!date.classList.value.match('selected'),
+    );
+
+    expect(selectedDate?.textContent).toEqual('3');
   });
 });

@@ -26,7 +26,7 @@ import api from '../../services/api';
 interface IMonthAvailability {
   day: number;
   available: boolean;
-  date: Date;
+  // date: Date;
 }
 
 interface AppointmentData {
@@ -40,7 +40,22 @@ interface AppointmentData {
 }
 
 const Dashboard: React.FC = () => {
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const today = new Date();
+
+    switch (today.getDay()) {
+      case 0:
+        today.setDate(today.getDate() + 1);
+        break;
+      case 6:
+        today.setDate(today.getDate() + 2);
+        break;
+      default:
+        break;
+    }
+
+    return today;
+  });
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [monthAvailability, setMonthAvailability] = useState<
     IMonthAvailability[]
@@ -94,6 +109,17 @@ const Dashboard: React.FC = () => {
 
   const disabledDays = useMemo(() => {
     const currentDate = new Date();
+
+    if (!monthAvailability.length) {
+      const days = Array.from({ length: 10 }, (_, i) => {
+        return {
+          day: i + 1,
+          available: true,
+        };
+      });
+
+      setMonthAvailability(days);
+    }
 
     const daysToDisable = monthAvailability
       .filter(monthDay => {
